@@ -727,14 +727,14 @@ function renderHTML(): string {
 
     // State
     let data = null;
-    let location = { lat: 40.7128, lon: -74.006 };
+    let userLocation = { lat: 40.7128, lon: -74.006 };
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Get user location
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          location = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
           fetchData();
         },
         () => fetchData() // Use default if denied
@@ -746,7 +746,7 @@ function renderHTML(): string {
     // Fetch all data
     async function fetchData() {
       try {
-        const res = await fetch(\`/api/data?lat=\${location.lat}&lon=\${location.lon}&tz=\${timezone}\`);
+        const res = await fetch(\`/api/data?lat=\${userLocation.lat}&lon=\${userLocation.lon}&tz=\${timezone}\`);
         data = await res.json();
         updateUI();
       } catch (e) {
