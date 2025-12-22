@@ -4,10 +4,10 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Custom domain routes
+# Custom domains (auto-configures DNS)
 routes = [
-  { pattern = "springcountdown.com/*", zone_name = "springcountdown.com" },
-  { pattern = "www.springcountdown.com/*", zone_name = "springcountdown.com" }
+  { pattern = "springcountdown.com", custom_domain = true },
+  { pattern = "www.springcountdown.com", custom_domain = true }
 ]
 
 # Development settings
