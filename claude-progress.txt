@@ -391,3 +391,45 @@
 
 ### Blockers
 - None
+
+---
+
+### Session: 2025-12-22 (PWA Icons)
+
+**Agent:** Claude Opus 4.5
+**Duration:** ~15 minutes
+**Feature worked on:** Fix PWA icons returning 404
+
+### Work Completed
+- Created sun-themed SVG icons (icon-192.svg, icon-512.svg):
+  - Dark navy background with rounded corners
+  - Warm golden sun with radial gradient (gold → orange)
+  - 16 radiating sun rays with glow effect
+  - Highlight for 3D depth
+- Updated manifest.json to reference SVG icons
+- Updated HTML head with correct icon references
+- Added PNG → SVG redirects for browser compatibility
+- Fixed manifest enctype warning (share_target)
+- Added mobile-web-app-capable meta tag
+
+### Technical Decisions
+- SVG icons for infinite scalability
+- 301 redirects from .png to .svg for backward compatibility
+- Icons match app's night sky + warm gold aesthetic
+
+### Commits Made
+- `5fdb349`: feat: add PWA icons (sun-themed SVG icons)
+- `33d2214`: fix: add PNG to SVG redirects and fix manifest warnings
+
+### Environment State
+- [x] PWA icons working (no more 404s)
+- [x] Deployed to Cloudflare Workers
+- [x] Live at https://springcountdown.com
+
+### Next Session Should
+1. Add location detection/geolocation API
+2. Add location search/autocomplete
+3. Add star patterns to remaining 17 constellations
+
+### Blockers
+- Git push to GitHub failing (permission issue with abandini repo)
