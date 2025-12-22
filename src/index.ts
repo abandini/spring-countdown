@@ -121,6 +121,57 @@ app.get('/icon.svg', (c) => {
   return c.text(svg, 200, { 'Content-Type': 'image/svg+xml' });
 });
 
+// OG Image for social sharing
+app.get('/og-image.png', async (c) => {
+  const countdowns = getCountdowns();
+  const days = countdowns.spring.days;
+
+  // Generate an SVG that can be rendered as PNG
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#0f172a"/>
+        <stop offset="100%" style="stop-color:#1e293b"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="50%" cy="30%" r="50%">
+        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#0f172a;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <rect width="1200" height="630" fill="url(#glow)"/>
+
+    <!-- Stars -->
+    ${Array.from({length: 50}, () => {
+      const x = Math.random() * 1200;
+      const y = Math.random() * 630;
+      const r = Math.random() * 2 + 1;
+      return `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${Math.random() * 0.5 + 0.3}"/>`;
+    }).join('')}
+
+    <!-- Sun -->
+    <circle cx="600" cy="180" r="80" fill="#f59e0b"/>
+    <circle cx="600" cy="180" r="55" fill="#fbbf24"/>
+    ${[0,45,90,135,180,225,270,315].map(angle =>
+      `<ellipse cx="600" cy="90" rx="6" ry="20" fill="#fef3c7" transform="rotate(${angle} 600 180)"/>`
+    ).join('')}
+
+    <!-- Text -->
+    <text x="600" y="340" text-anchor="middle" font-family="Georgia, serif" font-size="64" font-weight="700" fill="#fffbeb">Spring is Coming</text>
+
+    <text x="600" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="120" font-weight="700" fill="#f59e0b">${days}</text>
+    <text x="600" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" fill="#94a3b8">days until Spring Equinox</text>
+
+    <text x="600" y="580" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#64748b">spring-countdown.bill-burkey.workers.dev</text>
+  </svg>`;
+
+  // Return SVG as the OG image (most platforms accept SVG)
+  return c.text(svg, 200, {
+    'Content-Type': 'image/svg+xml',
+    'Cache-Control': 'public, max-age=3600'
+  });
+});
+
 function renderHTML(): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -129,9 +180,30 @@ function renderHTML(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f59e0b">
   <meta name="description" content="Count down to spring, track the growing daylight, and explore tonight's sky">
-  <meta property="og:title" content="Spring Countdown - The Days Are Getting Longer">
-  <meta property="og:description" content="Celebrate the return of longer days with astronomy, moon phases, and celestial wisdom">
-  <title>Spring Countdown</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spring-countdown.bill-burkey.workers.dev">
+  <meta property="og:title" content="Spring is Coming! 🌸 Count Down to Longer Days">
+  <meta property="og:description" content="Track the growing daylight since winter solstice. Explore moon phases, constellations, and celestial wisdom as we journey toward spring.">
+  <meta property="og:image" content="https://spring-countdown.bill-burkey.workers.dev/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://spring-countdown.bill-burkey.workers.dev">
+  <meta name="twitter:title" content="Spring is Coming! 🌸 Count Down to Longer Days">
+  <meta name="twitter:description" content="Track the growing daylight since winter solstice. Explore moon phases, constellations, and celestial wisdom.">
+  <meta name="twitter:image" content="https://spring-countdown.bill-burkey.workers.dev/og-image.png">
+
+  <!-- PWA / Apple -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Spring">
+  <link rel="apple-touch-icon" href="/icon.svg">
+
+  <title>Spring Countdown - The Days Are Getting Longer</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -521,6 +593,137 @@ function renderHTML(): string {
     footer a {
       color: var(--gold);
       text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--amber);
+      text-decoration: underline;
+    }
+
+    .footer-credit {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* Share Section */
+    .share-card {
+      text-align: center;
+    }
+
+    .share-subtitle {
+      color: var(--mist);
+      margin-bottom: 1.25rem;
+    }
+
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .share-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .share-btn:active {
+      transform: translateY(0);
+    }
+
+    .share-btn.twitter {
+      background: #000;
+      color: #fff;
+    }
+
+    .share-btn.facebook {
+      background: #1877f2;
+      color: #fff;
+    }
+
+    .share-btn.copy {
+      background: var(--slate);
+      color: var(--cream);
+    }
+
+    .share-btn.native {
+      background: var(--gold);
+      color: var(--night);
+    }
+
+    .copy-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--spring);
+      color: var(--night);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .copy-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* PWA Install Banner */
+    .install-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--slate) 100%);
+      padding: 1rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      z-index: 999;
+    }
+
+    .install-banner.show {
+      display: flex;
+    }
+
+    .install-btn {
+      background: var(--gold);
+      color: var(--night);
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .install-dismiss {
+      background: transparent;
+      color: var(--mist);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
     }
 
     /* Loading state */
@@ -720,9 +923,45 @@ function renderHTML(): string {
       </div>
     </section>
 
+    <!-- Share Section -->
+    <section class="card fade-in share-card">
+      <div class="card-header">
+        <span class="card-icon">📤</span>
+        <h2 class="card-title">Share the Light</h2>
+      </div>
+      <p class="share-subtitle">Spread the joy of longer days!</p>
+      <div class="share-buttons">
+        <button class="share-btn twitter" onclick="shareTwitter()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Share
+        </button>
+        <button class="share-btn facebook" onclick="shareFacebook()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Share
+        </button>
+        <button class="share-btn copy" onclick="copyLink()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Link
+        </button>
+        <button class="share-btn native" onclick="shareNative()" id="native-share" style="display:none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+      </div>
+      <div id="copy-toast" class="copy-toast">Link copied!</div>
+    </section>
+
     <footer>
       <p>Made with ☀️ to celebrate the return of light</p>
+      <p class="footer-credit">Brought to you by <a href="https://northcoast.ai" target="_blank" rel="noopener">North Coast AI</a></p>
     </footer>
+  </div>
+
+  <!-- PWA Install Banner -->
+  <div class="install-banner" id="install-banner">
+    <span>📱 Install Spring Countdown for quick access!</span>
+    <button class="install-btn" onclick="installPWA()">Install</button>
+    <button class="install-dismiss" onclick="dismissInstall()">Not now</button>
   </div>
 
   <script>
@@ -861,6 +1100,93 @@ function renderHTML(): string {
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');
+    }
+
+    // Social sharing
+    const shareUrl = 'https://spring-countdown.bill-burkey.workers.dev';
+    const shareTitle = 'Spring is Coming! 🌸';
+    const shareText = 'Only ' + document.getElementById('spring-days')?.textContent + ' days until Spring Equinox! Track the growing daylight and explore the night sky.';
+
+    function getShareText() {
+      const days = document.getElementById('spring-days')?.textContent || '??';
+      return 'Only ' + days + ' days until Spring Equinox! 🌸 Track the growing daylight and explore the night sky.';
+    }
+
+    function shareTwitter() {
+      const text = encodeURIComponent(getShareText());
+      const url = encodeURIComponent(shareUrl);
+      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank', 'width=550,height=420');
+    }
+
+    function shareFacebook() {
+      const url = encodeURIComponent(shareUrl);
+      window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'width=550,height=420');
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
+
+    function shareNative() {
+      if (navigator.share) {
+        navigator.share({
+          title: shareTitle,
+          text: getShareText(),
+          url: shareUrl
+        });
+      }
+    }
+
+    // Show native share button if available (mobile)
+    if (navigator.share) {
+      document.getElementById('native-share').style.display = 'flex';
+    }
+
+    // PWA Install prompt
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      // Show install banner after 5 seconds if not already installed
+      setTimeout(() => {
+        if (deferredPrompt && !localStorage.getItem('pwa-dismissed')) {
+          showInstallBanner();
+        }
+      }, 5000);
+    });
+
+    function showInstallBanner() {
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.add('show');
+    }
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('PWA installed');
+          }
+          deferredPrompt = null;
+          hideInstallBanner();
+        });
+      }
+    }
+
+    function dismissInstall() {
+      localStorage.setItem('pwa-dismissed', 'true');
+      hideInstallBanner();
+    }
+
+    function hideInstallBanner() {
+      const banner = document.getElementById('install-banner');
+      if (banner) banner.classList.remove('show');
     }
   </script>
 </body>
