@@ -200,3 +200,53 @@
 
 ### Blockers
 - None currently
+
+---
+
+### Session: 2025-12-22 (UI Refinement)
+
+**Agent:** Claude Opus 4.5
+**Duration:** ~20 minutes
+**Feature worked on:** Date display on countdown cards
+
+### Work Completed
+- Fixed JavaScript error: renamed `location` to `userLocation` (reserved browser property)
+- Updated all date constants from 2024-2025 to 2025-2026 cycle:
+  - Winter Solstice: December 21, 2025
+  - Spring Equinox: March 20, 2026
+  - DST Start: March 8, 2026
+- Added exact target dates to countdown cards:
+  - "March 20, 2026 • 6:46 AM EDT" under Spring Equinox
+  - "March 8, 2026 • 2:00 AM local" under DST
+- Added CSS for `.card-date` styling (subtle mist color, 0.8rem)
+- Pushed all changes to GitHub
+- Deployed to Cloudflare Workers
+
+### Commits Made
+- `351a3cf`: feat: add exact target dates to countdown cards
+
+### Environment State
+- [x] Git repository synced with GitHub
+- [x] D1 database migrated
+- [x] KV namespace active
+- [x] R2 bucket created
+- [x] Deployed to Cloudflare Workers
+- [x] Live at https://spring-countdown.bill-burkey.workers.dev
+
+### Features Working
+- core-001: Spring equinox countdown ✅
+- core-002: DST countdown ✅
+- data-001: Sunrise/sunset calculations ✅
+- astro-001: Moon phase display ✅
+- astro-002: Visible constellations ✅
+- astro-005: Sky lore/ancient astronomy ✅
+- ui-002: Distinctive visual theme ✅
+
+### Next Session Should
+1. Add location detection/search (currently defaults to NYC)
+2. Implement social sharing features
+3. Add PWA icons (currently 404ing)
+4. Test on mobile devices
+
+### Blockers
+- None
