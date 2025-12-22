@@ -12,8 +12,8 @@ local_protocol = "http"
 # Environment variables (non-sensitive)
 [vars]
 ENVIRONMENT = "production"
-SPRING_EQUINOX = "2025-03-20T09:01:00Z"  # UTC time for spring equinox
-DST_START = "2025-03-09T07:00:00Z"        # 2AM EST = 7AM UTC
+SPRING_EQUINOX = "2026-03-20T10:46:00Z"  # UTC time for spring equinox 2026
+DST_START = "2026-03-08T07:00:00Z"        # 2AM EST = 7AM UTC (March 8, 2026)
 
 # D1 Database - User preferences and location data
 [[d1_databases]]

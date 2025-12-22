@@ -56,11 +56,14 @@ export interface DaylightGain {
   };
 }
 
-// Winter solstice 2024 - shortest day
-const WINTER_SOLSTICE_2024 = new Date('2024-12-21T09:20:00Z');
+// Winter solstice 2025 - shortest day (December 21, 2025)
+const WINTER_SOLSTICE = new Date('2025-12-21T09:03:00Z');
 
-// Spring equinox 2025
-const SPRING_EQUINOX_2025 = new Date('2025-03-20T09:01:00Z');
+// Spring equinox 2026 (March 20, 2026)
+const SPRING_EQUINOX = new Date('2026-03-20T10:46:00Z');
+
+// DST 2026 starts March 8 at 2:00 AM local
+const DST_START = new Date('2026-03-08T07:00:00Z'); // 2AM EST = 7AM UTC
 
 /**
  * Format time to locale string
@@ -162,7 +165,7 @@ export function getDaylightGain(date: Date, lat: number, lon: number): DaylightG
   const gainSeconds = Math.round((gainMinutes - Math.floor(gainMinutes)) * 60);
 
   // Calculate gain since winter solstice
-  const solsticeMinutes = getDaylightMinutes(WINTER_SOLSTICE_2024, lat, lon);
+  const solsticeMinutes = getDaylightMinutes(WINTER_SOLSTICE, lat, lon);
   const totalGained = todayMinutes - solsticeMinutes;
 
   const gainHours = Math.floor(totalGained / 60);
@@ -195,14 +198,14 @@ export function getSpringProgress(date: Date, lat: number, lon: number): {
   daysRemaining: number;
 } {
   const currentDaylight = getDaylightMinutes(date, lat, lon);
-  const solsticeDaylight = getDaylightMinutes(WINTER_SOLSTICE_2024, lat, lon);
+  const solsticeDaylight = getDaylightMinutes(WINTER_SOLSTICE, lat, lon);
   const equinoxDaylight = 12 * 60; // 12 hours in minutes
 
   const totalGainNeeded = equinoxDaylight - solsticeDaylight;
   const currentGain = currentDaylight - solsticeDaylight;
-  const percentComplete = Math.min(100, Math.round((currentGain / totalGainNeeded) * 100));
+  const percentComplete = Math.min(100, Math.max(0, Math.round((currentGain / totalGainNeeded) * 100)));
 
-  const msRemaining = SPRING_EQUINOX_2025.getTime() - date.getTime();
+  const msRemaining = SPRING_EQUINOX.getTime() - date.getTime();
   const daysRemaining = Math.ceil(msRemaining / (1000 * 60 * 60 * 24));
 
   return {
@@ -234,15 +237,12 @@ export function getCountdowns(now: Date = new Date()): {
     totalMs: number;
   };
 } {
-  // DST 2025 starts March 9 at 2:00 AM local
-  const DST_2025 = new Date('2025-03-09T07:00:00Z'); // 2AM EST = 7AM UTC
-
-  const springMs = Math.max(0, SPRING_EQUINOX_2025.getTime() - now.getTime());
-  const dstMs = Math.max(0, DST_2025.getTime() - now.getTime());
+  const springMs = Math.max(0, SPRING_EQUINOX.getTime() - now.getTime());
+  const dstMs = Math.max(0, DST_START.getTime() - now.getTime());
 
   return {
     spring: {
-      target: SPRING_EQUINOX_2025,
+      target: SPRING_EQUINOX,
       days: Math.floor(springMs / (1000 * 60 * 60 * 24)),
       hours: Math.floor((springMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((springMs % (1000 * 60 * 60)) / (1000 * 60)),
@@ -250,7 +250,7 @@ export function getCountdowns(now: Date = new Date()): {
       totalMs: springMs
     },
     dst: {
-      target: DST_2025,
+      target: DST_START,
       days: Math.floor(dstMs / (1000 * 60 * 60 * 24)),
       hours: Math.floor((dstMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
       minutes: Math.floor((dstMs % (1000 * 60 * 60)) / (1000 * 60)),
