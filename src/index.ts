@@ -486,6 +486,87 @@ function renderHTML(): string {
       font-weight: 300;
     }
 
+    /* Location Indicator */
+    .location-bar {
+      margin-top: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .location-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      color: var(--mist);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .location-display .location-icon {
+      font-size: 1rem;
+    }
+
+    .location-display.loading {
+      animation: pulse-opacity 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-opacity {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .location-display.error {
+      border-color: rgba(248, 113, 113, 0.3);
+      color: var(--coral);
+    }
+
+    .location-display.success {
+      border-color: rgba(132, 204, 22, 0.3);
+    }
+
+    .location-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.5rem 0.9rem;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 2rem;
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .location-btn:hover {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: rgba(245, 158, 11, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .location-btn:active {
+      transform: translateY(0);
+    }
+
+    .location-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .location-coords {
+      font-size: 0.75rem;
+      color: var(--slate);
+      margin-left: 0.25rem;
+    }
+
     /* Cards */
     .card {
       background: var(--gradient-card);
@@ -1140,6 +1221,17 @@ function renderHTML(): string {
       </div>
       <h1>Spring is Coming</h1>
       <p class="tagline">The days are getting longer since the winter solstice</p>
+
+      <!-- Location Indicator -->
+      <div class="location-bar">
+        <div id="location-display" class="location-display loading">
+          <span class="location-icon">📍</span>
+          <span id="location-text">Detecting location...</span>
+        </div>
+        <button id="location-btn" class="location-btn" onclick="requestLocation()" disabled>
+          <span>🎯</span> Use My Location
+        </button>
+      </div>
     </header>
 
     <!-- Spring Countdown -->
@@ -1363,21 +1455,98 @@ function renderHTML(): string {
 
     // State
     let data = null;
-    let userLocation = { lat: 40.7128, lon: -74.006 };
+    let userLocation = { lat: 40.7128, lon: -74.006, name: 'New York, NY' };
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let locationGranted = false;
 
-    // Get user location
-    if ('geolocation' in navigator) {
+    // Location UI elements
+    const locationDisplay = document.getElementById('location-display');
+    const locationText = document.getElementById('location-text');
+    const locationBtn = document.getElementById('location-btn');
+
+    // Update location display
+    function updateLocationUI(state, text) {
+      locationDisplay.className = 'location-display ' + state;
+      locationText.textContent = text;
+      if (state !== 'loading') {
+        locationBtn.disabled = false;
+      }
+    }
+
+    // Reverse geocode to get city name
+    async function reverseGeocode(lat, lon) {
+      try {
+        // Use Nominatim (OpenStreetMap) for reverse geocoding
+        const res = await fetch(
+          \`https://nominatim.openstreetmap.org/reverse?lat=\${lat}&lon=\${lon}&format=json&zoom=10\`,
+          { headers: { 'User-Agent': 'SpringCountdown/1.0' } }
+        );
+        const data = await res.json();
+        if (data.address) {
+          const city = data.address.city || data.address.town || data.address.village || data.address.county;
+          const state = data.address.state;
+          const country = data.address.country_code?.toUpperCase();
+          if (city && (state || country)) {
+            return country === 'US' ? \`\${city}, \${state}\` : \`\${city}, \${country}\`;
+          }
+        }
+        return null;
+      } catch (e) {
+        console.warn('Reverse geocoding failed:', e);
+        return null;
+      }
+    }
+
+    // Request location from user
+    async function requestLocation() {
+      if (!('geolocation' in navigator)) {
+        updateLocationUI('error', 'Geolocation not supported');
+        return;
+      }
+
+      updateLocationUI('loading', 'Detecting location...');
+      locationBtn.disabled = true;
+
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        async (pos) => {
+          userLocation.lat = pos.coords.latitude;
+          userLocation.lon = pos.coords.longitude;
+          locationGranted = true;
+
+          // Try to get city name
+          const cityName = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+          if (cityName) {
+            userLocation.name = cityName;
+            updateLocationUI('success', cityName);
+          } else {
+            const coords = \`\${pos.coords.latitude.toFixed(2)}°, \${pos.coords.longitude.toFixed(2)}°\`;
+            userLocation.name = coords;
+            updateLocationUI('success', coords);
+          }
+
+          // Refresh data with new location
           fetchData();
         },
-        () => fetchData() // Use default if denied
+        (err) => {
+          console.warn('Geolocation error:', err.message);
+          if (err.code === 1) {
+            updateLocationUI('error', 'Location access denied');
+          } else if (err.code === 2) {
+            updateLocationUI('error', 'Location unavailable');
+          } else {
+            updateLocationUI('error', 'Location timeout');
+          }
+          // Still fetch with default location
+          if (!data) fetchData();
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
       );
-    } else {
-      fetchData();
     }
+    // Make requestLocation available globally for onclick
+    window.requestLocation = requestLocation;
+
+    // Initial location detection
+    requestLocation()
 
     // Fetch all data
     async function fetchData() {
