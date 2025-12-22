@@ -1,0 +1,50 @@
+# Spring Countdown - Cloudflare Worker Configuration
+name = "spring-countdown"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Environment variables (non-sensitive)
+[vars]
+ENVIRONMENT = "production"
+SPRING_EQUINOX = "2025-03-20T09:01:00Z"  # UTC time for spring equinox
+DST_START = "2025-03-09T07:00:00Z"        # 2AM EST = 7AM UTC
+
+# D1 Database - User preferences and location data
+[[d1_databases]]
+binding = "DB"
+database_name = "spring-db"
+database_id = "placeholder"  # Run: wrangler d1 create spring-db
+
+# KV Namespace - Caching sunrise/sunset data
+[[kv_namespaces]]
+binding = "KV"
+id = "placeholder"  # Run: wrangler kv:namespace create SPRING_KV
+
+# R2 Bucket - Generated share images
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "spring-images"
+
+# Workers AI binding
+[ai]
+binding = "AI"
+
+# Assets (static files)
+[assets]
+directory = "./public"
+
+# Staging environment
+[env.staging]
+name = "spring-countdown-staging"
+vars = { ENVIRONMENT = "staging" }
+
+# Preview environment (for PR deploys)
+[env.preview]
+name = "spring-countdown-preview"
+vars = { ENVIRONMENT = "preview" }

@@ -1,0 +1,37 @@
+{
+  "name": "spring-countdown",
+  "version": "0.1.0",
+  "description": "A joyful PWA counting down to spring with sunlight tracking",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:remote": "wrangler dev --remote",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:migrate:local": "wrangler d1 migrations apply spring-db --local",
+    "db:migrate": "wrangler d1 migrations apply spring-db",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest"
+  },
+  "keywords": [
+    "spring",
+    "countdown",
+    "pwa",
+    "cloudflare-workers",
+    "sunlight"
+  ],
+  "author": "Bill Burkey",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.6.0",
+    "wrangler": "^3.99.0"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "suncalc": "^1.9.0"
+  }
+}

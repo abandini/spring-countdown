@@ -1,0 +1,508 @@
+{
+  "project": "Spring Countdown",
+  "description": "A joyful PWA counting down to spring and daylight savings time, celebrating the return of longer days with sunlight tracking, social sharing, and Cloudflare's AI suite",
+  "created": "2025-12-22",
+  "stats": {
+    "total": 42,
+    "passing": 0,
+    "failing": 42
+  },
+  "features": [
+    {
+      "id": "core-001",
+      "category": "Core Countdowns",
+      "priority": 1,
+      "description": "Spring equinox countdown timer (March 20, 2025 5:01 AM EDT)",
+      "acceptance_criteria": [
+        "Displays days, hours, minutes, seconds until spring equinox",
+        "Updates in real-time",
+        "Accurate to user's timezone"
+      ],
+      "passes": false
+    },
+    {
+      "id": "core-002",
+      "category": "Core Countdowns",
+      "priority": 1,
+      "description": "DST 'Spring Forward' countdown (March 9, 2025 2:00 AM local)",
+      "acceptance_criteria": [
+        "Displays countdown to DST transition",
+        "Shows 'Spring Forward' messaging",
+        "Handles timezone differences"
+      ],
+      "passes": false
+    },
+    {
+      "id": "core-003",
+      "category": "Core Countdowns",
+      "priority": 1,
+      "description": "Animated countdown display with flip/tick animation",
+      "acceptance_criteria": [
+        "Numbers animate when changing",
+        "Smooth 60fps animation",
+        "Works on mobile devices"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-001",
+      "category": "Sunlight Tracking",
+      "priority": 1,
+      "description": "Display today's sunrise and sunset times",
+      "acceptance_criteria": [
+        "Shows accurate sunrise time for user location",
+        "Shows accurate sunset time for user location",
+        "Updates daily"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-002",
+      "category": "Sunlight Tracking",
+      "priority": 1,
+      "description": "Calculate and display today's total daylight duration",
+      "acceptance_criteria": [
+        "Shows hours and minutes of daylight",
+        "Calculated from sunrise/sunset",
+        "Formatted readably (e.g., '9h 42m')"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-003",
+      "category": "Sunlight Tracking",
+      "priority": 1,
+      "description": "Show daily sunlight gain compared to yesterday",
+      "acceptance_criteria": [
+        "Displays minutes/seconds gained",
+        "Positive indicator styling",
+        "Compares to previous day accurately"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-004",
+      "category": "Sunlight Tracking",
+      "priority": 2,
+      "description": "Cumulative sunlight gained since winter solstice",
+      "acceptance_criteria": [
+        "Calculates total minutes gained since Dec 21",
+        "Updates daily",
+        "Displayed prominently"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-005",
+      "category": "Sunlight Tracking",
+      "priority": 2,
+      "description": "Weekly sunlight gain visualization chart",
+      "acceptance_criteria": [
+        "Shows last 7 days of daylight duration",
+        "Visual chart/graph format",
+        "Clear upward trend visible"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sunlight-006",
+      "category": "Sunlight Tracking",
+      "priority": 2,
+      "description": "Progress visualization to spring equinox (12h daylight)",
+      "acceptance_criteria": [
+        "Arc or ring showing progress",
+        "Current daylight vs 12h target",
+        "Percentage complete shown"
+      ],
+      "passes": false
+    },
+    {
+      "id": "location-001",
+      "category": "Location",
+      "priority": 1,
+      "description": "Geolocation detection for user location",
+      "acceptance_criteria": [
+        "Requests browser geolocation permission",
+        "Handles permission denied gracefully",
+        "Stores location for future visits"
+      ],
+      "passes": false
+    },
+    {
+      "id": "location-002",
+      "category": "Location",
+      "priority": 1,
+      "description": "Manual location input/search",
+      "acceptance_criteria": [
+        "City search functionality",
+        "Dropdown or autocomplete",
+        "Stores selection"
+      ],
+      "passes": false
+    },
+    {
+      "id": "location-003",
+      "category": "Location",
+      "priority": 1,
+      "description": "Timezone detection and handling",
+      "acceptance_criteria": [
+        "Detects user timezone automatically",
+        "Converts all times appropriately",
+        "Handles DST transitions correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-001",
+      "category": "UI/UX",
+      "priority": 1,
+      "description": "Responsive mobile-first design",
+      "acceptance_criteria": [
+        "Works on phones (320px+)",
+        "Works on tablets",
+        "Works on desktop",
+        "Touch-friendly controls"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-002",
+      "category": "UI/UX",
+      "priority": 1,
+      "description": "Distinctive visual theme (spring/sun aesthetic)",
+      "acceptance_criteria": [
+        "Warm, optimistic color palette",
+        "Sun/spring imagery",
+        "Not generic AI aesthetic",
+        "Delightful and joyful feel"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-003",
+      "category": "UI/UX",
+      "priority": 2,
+      "description": "Animated sun/horizon visual element",
+      "acceptance_criteria": [
+        "Sun rises/sets based on current time",
+        "Smooth CSS/JS animation",
+        "Represents current daylight progress"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-004",
+      "category": "UI/UX",
+      "priority": 2,
+      "description": "Dark/light theme toggle",
+      "acceptance_criteria": [
+        "Manual toggle available",
+        "Respects system preference",
+        "Persists user choice"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-005",
+      "category": "UI/UX",
+      "priority": 2,
+      "description": "Micro-interactions and delightful animations",
+      "acceptance_criteria": [
+        "Button hover/tap feedback",
+        "Celebration animations on milestones",
+        "Smooth transitions between states"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-006",
+      "category": "UI/UX",
+      "priority": 2,
+      "description": "WCAG accessibility compliance",
+      "acceptance_criteria": [
+        "Color contrast meets AA standard",
+        "Keyboard navigation works",
+        "Screen reader compatible",
+        "Focus indicators visible"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-001",
+      "category": "PWA",
+      "priority": 1,
+      "description": "Web App Manifest with icons and metadata",
+      "acceptance_criteria": [
+        "manifest.json with all required fields",
+        "Multiple icon sizes (192, 512)",
+        "Theme and background colors set",
+        "App name and description"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-002",
+      "category": "PWA",
+      "priority": 1,
+      "description": "Service Worker for offline support",
+      "acceptance_criteria": [
+        "Caches critical assets",
+        "App loads when offline",
+        "Shows cached data when offline"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-003",
+      "category": "PWA",
+      "priority": 2,
+      "description": "Install prompt (Add to Home Screen)",
+      "acceptance_criteria": [
+        "Custom install banner/button",
+        "Handles beforeinstallprompt event",
+        "Works on Android and iOS"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-004",
+      "category": "PWA",
+      "priority": 3,
+      "description": "Push notifications for daily sunrise",
+      "acceptance_criteria": [
+        "Optional daily notification at sunrise",
+        "Shows today's daylight gain",
+        "User can opt in/out"
+      ],
+      "passes": false
+    },
+    {
+      "id": "social-001",
+      "category": "Social Sharing",
+      "priority": 1,
+      "description": "Social sharing buttons (Twitter, Facebook, etc.)",
+      "acceptance_criteria": [
+        "Share to major platforms",
+        "Pre-filled share text",
+        "Native share API on mobile"
+      ],
+      "passes": false
+    },
+    {
+      "id": "social-002",
+      "category": "Social Sharing",
+      "priority": 1,
+      "description": "Open Graph and Twitter Card meta tags",
+      "acceptance_criteria": [
+        "OG title, description, image",
+        "Twitter card tags",
+        "Dynamic based on current countdown"
+      ],
+      "passes": false
+    },
+    {
+      "id": "social-003",
+      "category": "Social Sharing",
+      "priority": 2,
+      "description": "Generate shareable countdown image",
+      "acceptance_criteria": [
+        "Creates PNG/JPG with current stats",
+        "Branded design",
+        "Downloadable or shareable"
+      ],
+      "passes": false
+    },
+    {
+      "id": "social-004",
+      "category": "Social Sharing",
+      "priority": 3,
+      "description": "Copy link to clipboard functionality",
+      "acceptance_criteria": [
+        "One-click copy",
+        "Feedback on success",
+        "Works across browsers"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-001",
+      "category": "Cloudflare",
+      "priority": 1,
+      "description": "Cloudflare Worker serving the application",
+      "acceptance_criteria": [
+        "Worker handles all routes",
+        "Serves HTML, CSS, JS",
+        "Fast response times"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-002",
+      "category": "Cloudflare",
+      "priority": 1,
+      "description": "D1 database for user preferences",
+      "acceptance_criteria": [
+        "Schema for user locations/preferences",
+        "CRUD operations work",
+        "Migrations set up"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-003",
+      "category": "Cloudflare",
+      "priority": 2,
+      "description": "KV storage for caching sunrise/sunset data",
+      "acceptance_criteria": [
+        "Caches daily sun data by location",
+        "Appropriate TTL settings",
+        "Cache invalidation works"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-004",
+      "category": "Cloudflare",
+      "priority": 2,
+      "description": "R2 storage for generated share images",
+      "acceptance_criteria": [
+        "Stores generated images",
+        "Public access for sharing",
+        "Cleanup of old images"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-005",
+      "category": "Cloudflare",
+      "priority": 2,
+      "description": "Workers AI for celebratory messages",
+      "acceptance_criteria": [
+        "Generates unique daily encouragements",
+        "Spring/sunshine themed",
+        "Rate limited appropriately"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-006",
+      "category": "Cloudflare",
+      "priority": 1,
+      "description": "Secrets management for API keys",
+      "acceptance_criteria": [
+        "No secrets in code",
+        "Uses wrangler secrets",
+        "Works in dev and prod"
+      ],
+      "passes": false
+    },
+    {
+      "id": "cf-007",
+      "category": "Cloudflare",
+      "priority": 1,
+      "description": "GitHub Actions deployment pipeline",
+      "acceptance_criteria": [
+        "Deploys on push to main",
+        "Runs tests before deploy",
+        "Single source of truth"
+      ],
+      "passes": false
+    },
+    {
+      "id": "data-001",
+      "category": "Data",
+      "priority": 1,
+      "description": "Sunrise/sunset calculation engine",
+      "acceptance_criteria": [
+        "Accurate calculations for any lat/long",
+        "Handles all dates",
+        "No external API dependency for core calc"
+      ],
+      "passes": false
+    },
+    {
+      "id": "data-002",
+      "category": "Data",
+      "priority": 2,
+      "description": "Historical daylight data comparison",
+      "acceptance_criteria": [
+        "Can calculate for past dates",
+        "Shows progress since solstice",
+        "Accurate historical data"
+      ],
+      "passes": false
+    },
+    {
+      "id": "engage-001",
+      "category": "Engagement",
+      "priority": 2,
+      "description": "Milestone celebrations (halfway to spring, etc.)",
+      "acceptance_criteria": [
+        "Detects milestone dates",
+        "Special UI treatment",
+        "Shareable milestone moments"
+      ],
+      "passes": false
+    },
+    {
+      "id": "engage-002",
+      "category": "Engagement",
+      "priority": 3,
+      "description": "Anonymous view counter",
+      "acceptance_criteria": [
+        "Tracks total site visits",
+        "Privacy-respecting",
+        "Displays count optionally"
+      ],
+      "passes": false
+    },
+    {
+      "id": "engage-003",
+      "category": "Engagement",
+      "priority": 3,
+      "description": "Daily check-in streak tracking",
+      "acceptance_criteria": [
+        "Tracks consecutive days visited",
+        "Streak display",
+        "Local storage based"
+      ],
+      "passes": false
+    },
+    {
+      "id": "engage-004",
+      "category": "Engagement",
+      "priority": 2,
+      "description": "Fun facts about spring and daylight",
+      "acceptance_criteria": [
+        "Rotating daily facts",
+        "Spring/equinox/sun themed",
+        "Engaging and educational"
+      ],
+      "passes": false
+    },
+    {
+      "id": "perf-001",
+      "category": "Performance",
+      "priority": 1,
+      "description": "Core Web Vitals optimization",
+      "acceptance_criteria": [
+        "LCP < 2.5s",
+        "FID < 100ms",
+        "CLS < 0.1"
+      ],
+      "passes": false
+    },
+    {
+      "id": "perf-002",
+      "category": "Performance",
+      "priority": 2,
+      "description": "Asset optimization (images, fonts, CSS)",
+      "acceptance_criteria": [
+        "Compressed images",
+        "Font subsetting or system fonts",
+        "Minified CSS/JS"
+      ],
+      "passes": false
+    }
+  ]
+}
