@@ -312,9 +312,13 @@ function renderHTML(): string {
 
     .card-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.75rem;
       margin-bottom: 1rem;
+    }
+
+    .card-header .card-icon {
+      margin-top: 0.1rem;
     }
 
     .card-icon {
