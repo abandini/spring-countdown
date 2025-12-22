@@ -305,11 +305,15 @@ function renderHTML(): string {
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Spring">
-  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.svg">
 
   <title>Spring Countdown - The Days Are Getting Longer</title>
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+  <link rel="icon" sizes="192x192" href="/icons/icon-192.svg">
+  <link rel="icon" sizes="512x512" href="/icons/icon-512.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="sunGlow512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="70%" stop-color="#FF9500"/>
+      <stop offset="100%" stop-color="#FF6B00"/>
+    </radialGradient>
+    <filter id="glow512">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a1a2e" rx="64"/>
+
+  <!-- Sun rays -->
+  <g fill="#FFD700" opacity="0.9" filter="url(#glow512)">
+    <!-- Cardinal rays -->
+    <polygon points="256,20 264,100 248,100"/>
+    <polygon points="256,492 264,412 248,412"/>
+    <polygon points="20,256 100,264 100,248"/>
+    <polygon points="492,256 412,264 412,248"/>
+
+    <!-- Diagonal rays -->
+    <polygon points="88,88 152,136 136,152"/>
+    <polygon points="424,88 360,136 376,152"/>
+    <polygon points="88,424 152,376 136,360"/>
+    <polygon points="424,424 360,376 376,360"/>
+
+    <!-- Intermediate rays -->
+    <polygon points="156,36 176,116 152,108"/>
+    <polygon points="356,36 336,116 360,108"/>
+    <polygon points="156,476 176,396 152,404"/>
+    <polygon points="356,476 336,396 360,404"/>
+
+    <polygon points="36,156 116,176 108,152"/>
+    <polygon points="476,156 396,176 404,152"/>
+    <polygon points="36,356 116,336 108,360"/>
+    <polygon points="476,356 396,336 404,360"/>
+
+    <!-- Extra rays for richness -->
+    <polygon points="120,56 144,124 120,116"/>
+    <polygon points="392,56 368,124 392,116"/>
+    <polygon points="120,456 144,388 120,396"/>
+    <polygon points="392,456 368,388 392,396"/>
+
+    <polygon points="56,120 124,144 116,120"/>
+    <polygon points="456,120 388,144 396,120"/>
+    <polygon points="56,392 124,368 116,392"/>
+    <polygon points="456,392 388,368 396,392"/>
+  </g>
+
+  <!-- Sun circle -->
+  <circle cx="256" cy="256" r="120" fill="url(#sunGlow512)" filter="url(#glow512)"/>
+
+  <!-- Sun highlight -->
+  <circle cx="230" cy="230" r="44" fill="#FFEB3B" opacity="0.4"/>
+</svg>

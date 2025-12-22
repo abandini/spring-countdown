@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="70%" stop-color="#FF9500"/>
+      <stop offset="100%" stop-color="#FF6B00"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="192" height="192" fill="#1a1a2e" rx="24"/>
+
+  <!-- Sun rays -->
+  <g fill="#FFD700" opacity="0.9" filter="url(#glow)">
+    <!-- 12 rays around the sun -->
+    <polygon points="96,8 100,40 92,40"/>
+    <polygon points="96,184 100,152 92,152"/>
+    <polygon points="8,96 40,100 40,92"/>
+    <polygon points="184,96 152,100 152,92"/>
+
+    <!-- Diagonal rays -->
+    <polygon points="34,34 58,52 52,58"/>
+    <polygon points="158,34 134,52 140,58"/>
+    <polygon points="34,158 58,140 52,134"/>
+    <polygon points="158,158 134,140 140,134"/>
+
+    <!-- More rays for fullness -->
+    <polygon points="60,16 68,46 58,42"/>
+    <polygon points="132,16 124,46 134,42"/>
+    <polygon points="60,176 68,146 58,150"/>
+    <polygon points="132,176 124,146 134,150"/>
+
+    <polygon points="16,60 46,68 42,58"/>
+    <polygon points="176,60 146,68 150,58"/>
+    <polygon points="16,132 46,124 42,134"/>
+    <polygon points="176,132 146,124 150,134"/>
+  </g>
+
+  <!-- Sun circle -->
+  <circle cx="96" cy="96" r="44" fill="url(#sunGlow)" filter="url(#glow)"/>
+
+  <!-- Sun highlight -->
+  <circle cx="86" cy="86" r="16" fill="#FFEB3B" opacity="0.4"/>
+</svg>
