@@ -328,6 +328,13 @@ function renderHTML(): string {
       color: var(--peach);
     }
 
+    .card-date {
+      font-size: 0.8rem;
+      color: var(--mist);
+      margin-top: 0.15rem;
+      font-weight: 400;
+    }
+
     /* Countdown grid */
     .countdown-grid {
       display: grid;
@@ -572,7 +579,10 @@ function renderHTML(): string {
     <section class="card fade-in stagger-1">
       <div class="card-header">
         <span class="card-icon">🌸</span>
-        <h2 class="card-title">Until Spring Equinox</h2>
+        <div>
+          <h2 class="card-title">Until Spring Equinox</h2>
+          <p class="card-date">March 20, 2026 • 6:46 AM EDT</p>
+        </div>
       </div>
       <div class="countdown-grid" id="spring-countdown">
         <div class="countdown-item">
@@ -598,7 +608,10 @@ function renderHTML(): string {
     <section class="card fade-in stagger-2">
       <div class="card-header">
         <span class="card-icon">⏰</span>
-        <h2 class="card-title">Until "Spring Forward" DST</h2>
+        <div>
+          <h2 class="card-title">Until "Spring Forward" DST</h2>
+          <p class="card-date">March 8, 2026 • 2:00 AM local</p>
+        </div>
       </div>
       <div class="countdown-grid" id="dst-countdown">
         <div class="countdown-item">
