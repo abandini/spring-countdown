@@ -27,6 +27,17 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Redirect old PNG icon requests to SVG
+app.get('/icons/icon-192.png', (c) => {
+  return c.redirect('/icons/icon-192.svg', 301);
+});
+app.get('/icons/icon-512.png', (c) => {
+  return c.redirect('/icons/icon-512.svg', 301);
+});
+app.get('/icon.svg', (c) => {
+  return c.redirect('/icons/icon-192.svg', 301);
+});
+
 // API: Get all data
 app.get('/api/data', (c) => {
   const url = new URL(c.req.url);
@@ -302,6 +313,7 @@ function renderHTML(): string {
   <meta name="twitter:image" content="https://springcountdown.com/og-image.png">
 
   <!-- PWA / Apple -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Spring">
