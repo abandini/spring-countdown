@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { getCountdowns, getDaylightInfo, getDaylightGain, getSpringProgress } from './utils/sun';
 import { getMoonInfo, formatMoonTimes } from './utils/moon';
-import { getVisibleConstellations } from './data/constellations';
+import { getVisibleConstellations, CONSTELLATIONS } from './data/constellations';
+import type { Constellation, VisibleConstellation } from './data/constellations';
 import { getDailySkyLore, getUpcomingEvents } from './data/sky-lore';
 
 // Type definitions for Cloudflare bindings
@@ -68,6 +69,109 @@ app.get('/api/countdown', (c) => {
   const countdowns = getCountdowns();
   return c.json(countdowns);
 });
+
+// API: Get constellation details with star pattern
+app.get('/api/constellation/:name', (c) => {
+  const name = c.req.param('name');
+  const url = new URL(c.req.url);
+  const lat = parseFloat(url.searchParams.get('lat') || String(DEFAULT_LAT));
+  const lon = parseFloat(url.searchParams.get('lon') || String(DEFAULT_LON));
+
+  // Find the constellation
+  const constellation = CONSTELLATIONS.find(
+    c => c.name.toLowerCase() === name.toLowerCase() ||
+         c.abbreviation.toLowerCase() === name.toLowerCase()
+  );
+
+  if (!constellation) {
+    return c.json({ error: 'Constellation not found' }, 404);
+  }
+
+  // Calculate best viewing time tonight
+  const now = new Date();
+  const bestViewing = calculateBestViewingTime(constellation, lat, lon, now);
+
+  return c.json({
+    ...constellation,
+    bestViewing
+  });
+});
+
+// Calculate best viewing time for a constellation
+function calculateBestViewingTime(constellation: Constellation, lat: number, lon: number, date: Date): {
+  tonight: string;
+  peak: string;
+  altitude: string;
+  tips: string;
+} {
+  // Calculate when constellation is highest in the sky
+  const currentMonth = date.getMonth() + 1;
+  const isBestMonth = constellation.bestViewingMonths.includes(currentMonth);
+
+  // Calculate approximate transit time (when constellation crosses meridian)
+  // Local sidereal time when object is at meridian = Right Ascension
+  const J2000 = new Date('2000-01-01T12:00:00Z');
+  const daysSinceJ2000 = (date.getTime() - J2000.getTime()) / (1000 * 60 * 60 * 24);
+  let gmst = 18.697374558 + 24.06570982441908 * daysSinceJ2000;
+  gmst = gmst % 24;
+  if (gmst < 0) gmst += 24;
+
+  // LST at midnight
+  const midnightUTC = new Date(date);
+  midnightUTC.setHours(0, 0, 0, 0);
+  const daysSinceJ2000Midnight = (midnightUTC.getTime() - J2000.getTime()) / (1000 * 60 * 60 * 24);
+  let lstMidnight = 18.697374558 + 24.06570982441908 * daysSinceJ2000Midnight + lon / 15;
+  lstMidnight = lstMidnight % 24;
+  if (lstMidnight < 0) lstMidnight += 24;
+
+  // Hours until transit from midnight
+  let hoursToTransit = constellation.rightAscension - lstMidnight;
+  if (hoursToTransit < 0) hoursToTransit += 24;
+  if (hoursToTransit > 12) hoursToTransit -= 24;
+
+  // Convert to local time
+  const transitHour = (hoursToTransit + 24) % 24;
+
+  // Format the peak time
+  const peakHour = Math.floor(transitHour);
+  const peakMin = Math.round((transitHour - peakHour) * 60);
+  const isPM = peakHour >= 12;
+  const displayHour = peakHour === 0 ? 12 : peakHour > 12 ? peakHour - 12 : peakHour;
+  const peakTime = `${displayHour}:${peakMin.toString().padStart(2, '0')} ${isPM ? 'AM' : 'PM'}`;
+
+  // Calculate maximum altitude at transit
+  const maxAlt = 90 - Math.abs(lat - constellation.declination);
+
+  // Viewing tips
+  let tips = '';
+  if (maxAlt > 60) {
+    tips = 'Will be high overhead - excellent viewing! Look up near zenith.';
+  } else if (maxAlt > 30) {
+    tips = `Look ${constellation.declination > lat ? 'north' : 'south'} about ${Math.round(maxAlt)}° above the horizon.`;
+  } else {
+    tips = `Low on the ${constellation.declination > lat ? 'northern' : 'southern'} horizon. Find a clear view in that direction.`;
+  }
+
+  // Is it visible tonight?
+  const tonight = isBestMonth
+    ? `Visible tonight during ${constellation.bestViewingTime}`
+    : `Better viewing in ${getMonthNames(constellation.bestViewingMonths)}`;
+
+  return {
+    tonight,
+    peak: `Highest at ~${peakTime} local time`,
+    altitude: maxAlt > 60 ? 'Very high' : maxAlt > 30 ? 'Mid-sky' : 'Low',
+    tips
+  };
+}
+
+function getMonthNames(months: number[]): string {
+  const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (months.length <= 3) {
+    return months.map(m => names[m - 1]).join(', ');
+  }
+  return `${names[months[0] - 1]} - ${names[months[months.length - 1] - 1]}`;
+}
 
 // Main app
 app.get('/', (c) => {
@@ -763,6 +867,246 @@ function renderHTML(): string {
     .stagger-3 { animation-delay: 0.3s; opacity: 0; }
     .stagger-4 { animation-delay: 0.4s; opacity: 0; }
     .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+    /* Constellation Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 1rem;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--night) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--mist);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--cream);
+    }
+
+    .modal-header {
+      position: relative;
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: var(--peach);
+      margin-bottom: 0.25rem;
+    }
+
+    .modal-subtitle {
+      color: var(--mist);
+      font-size: 0.9rem;
+    }
+
+    /* Star Pattern SVG */
+    .star-pattern-container {
+      padding: 1rem 1.5rem;
+      background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 1) 100%);
+    }
+
+    .star-pattern-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .star-pattern-svg .star-line {
+      stroke: rgba(148, 163, 184, 0.4);
+      stroke-width: 1;
+      fill: none;
+    }
+
+    .star-pattern-svg .star {
+      fill: var(--cream);
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+    }
+
+    .star-pattern-svg .star-label {
+      fill: var(--gold);
+      font-size: 3px;
+      font-family: var(--font-body);
+      text-anchor: middle;
+    }
+
+    .no-pattern {
+      text-align: center;
+      padding: 2rem;
+      color: var(--mist);
+    }
+
+    /* Modal Body */
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-section-content {
+      color: var(--cream);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .viewing-info {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .viewing-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+
+    .viewing-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .viewing-icon {
+      font-size: 1.25rem;
+    }
+
+    .viewing-text {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .viewing-text strong {
+      color: var(--peach);
+    }
+
+    .difficulty-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .difficulty-easy {
+      background: rgba(132, 204, 22, 0.2);
+      color: var(--spring);
+    }
+
+    .difficulty-moderate {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--gold);
+    }
+
+    .difficulty-challenging {
+      background: rgba(248, 113, 113, 0.2);
+      color: var(--coral);
+    }
+
+    /* Clickable constellation items */
+    .constellation-item {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .constellation-item:hover {
+      background: rgba(245, 158, 11, 0.1);
+      transform: translateX(4px);
+    }
+
+    .constellation-item::after {
+      content: '→';
+      opacity: 0;
+      margin-left: 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .constellation-item:hover::after {
+      opacity: 1;
+    }
+
+    .modal-loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--mist);
+    }
+
+    .modal-loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -964,6 +1308,26 @@ function renderHTML(): string {
     <button class="install-dismiss" onclick="dismissInstall()">Not now</button>
   </div>
 
+  <!-- Constellation Modal -->
+  <div class="modal-overlay" id="constellation-modal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeConstellationModal()">×</button>
+        <h2 class="modal-title" id="modal-title">Loading...</h2>
+        <p class="modal-subtitle" id="modal-subtitle"></p>
+      </div>
+      <div class="star-pattern-container" id="star-pattern-container">
+        <div class="modal-loading">
+          <div class="spinner"></div>
+          <p>Loading star pattern...</p>
+        </div>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Content loaded dynamically -->
+      </div>
+    </div>
+  </div>
+
   <script>
     // Generate stars
     function createStars() {
@@ -1061,11 +1425,11 @@ function renderHTML(): string {
         data.moon.phase.illumination + '% illuminated • Rise: ' + data.moon.times.rise + ' • Set: ' + data.moon.times.set;
       document.getElementById('moon-zodiac').textContent = 'Moon in ' + data.moon.zodiacSign;
 
-      // Constellations
+      // Constellations (clickable)
       const constEl = document.getElementById('constellations');
       if (data.constellations.length > 0) {
         constEl.innerHTML = data.constellations.map(c => \`
-          <div class="constellation-item">
+          <div class="constellation-item" onclick="openConstellationModal('\${c.name}')" role="button" tabindex="0">
             <div>
               <div class="constellation-name">\${c.name}</div>
               <div class="constellation-meta">\${c.brightestStar} • \${c.difficulty}</div>
@@ -1188,6 +1552,151 @@ function renderHTML(): string {
       const banner = document.getElementById('install-banner');
       if (banner) banner.classList.remove('show');
     }
+
+    // Constellation Modal Functions
+    async function openConstellationModal(name) {
+      const modal = document.getElementById('constellation-modal');
+      const titleEl = document.getElementById('modal-title');
+      const subtitleEl = document.getElementById('modal-subtitle');
+      const patternContainer = document.getElementById('star-pattern-container');
+      const bodyEl = document.getElementById('modal-body');
+
+      // Show modal with loading state
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      titleEl.textContent = name;
+      subtitleEl.textContent = 'Loading...';
+      patternContainer.innerHTML = '<div class="modal-loading"><div class="spinner"></div><p>Loading star pattern...</p></div>';
+      bodyEl.innerHTML = '';
+
+      try {
+        // Fetch constellation details
+        const res = await fetch(\`/api/constellation/\${encodeURIComponent(name)}?lat=\${userLocation.lat}&lon=\${userLocation.lon}\`);
+        const constellation = await res.json();
+
+        if (constellation.error) {
+          throw new Error(constellation.error);
+        }
+
+        // Update header
+        titleEl.textContent = constellation.name;
+        subtitleEl.textContent = \`\${constellation.latinName} (\${constellation.abbreviation}) • \${constellation.brightestStar}\`;
+
+        // Render star pattern
+        if (constellation.starPattern) {
+          patternContainer.innerHTML = renderStarPattern(constellation.starPattern, constellation.name);
+        } else {
+          patternContainer.innerHTML = '<div class="no-pattern">✨ Star pattern visualization coming soon</div>';
+        }
+
+        // Render body content
+        bodyEl.innerHTML = \`
+          <div class="modal-section">
+            <div class="modal-section-title">Tonight's Viewing</div>
+            <div class="viewing-info">
+              <div class="viewing-row">
+                <span class="viewing-icon">🌙</span>
+                <span class="viewing-text">\${constellation.bestViewing.tonight}</span>
+              </div>
+              <div class="viewing-row">
+                <span class="viewing-icon">⏰</span>
+                <span class="viewing-text">\${constellation.bestViewing.peak}</span>
+              </div>
+              <div class="viewing-row">
+                <span class="viewing-icon">📍</span>
+                <span class="viewing-text">\${constellation.bestViewing.tips}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">About</div>
+            <p class="modal-section-content">\${constellation.description}</p>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Mythology</div>
+            <p class="modal-section-content">\${constellation.mythology}</p>
+          </div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Viewing Details</div>
+            <p class="modal-section-content">
+              <strong>Best months:</strong> \${formatBestMonths(constellation.bestViewingMonths)}<br>
+              <strong>Best time:</strong> \${constellation.bestViewingTime}<br>
+              <strong>Direction:</strong> \${constellation.direction}<br>
+              <span class="difficulty-badge difficulty-\${constellation.difficulty}">\${constellation.difficulty}</span>
+            </p>
+          </div>
+        \`;
+      } catch (err) {
+        console.error('Failed to load constellation:', err);
+        patternContainer.innerHTML = '<div class="no-pattern">❌ Failed to load constellation data</div>';
+        bodyEl.innerHTML = '<p style="text-align: center; color: var(--mist);">Please try again later.</p>';
+      }
+    }
+
+    function renderStarPattern(pattern, name) {
+      const { stars, lines } = pattern;
+
+      // Build SVG
+      let svg = '<svg class="star-pattern-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">';
+
+      // Draw constellation lines first (behind stars)
+      for (const [startIdx, endIdx] of lines) {
+        const start = stars[startIdx];
+        const end = stars[endIdx];
+        if (start && end) {
+          svg += \`<line class="star-line" x1="\${start.x}" y1="\${start.y}" x2="\${end.x}" y2="\${end.y}"/>\`;
+        }
+      }
+
+      // Draw stars
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
+        const radius = star.size * 0.6; // Scale star size
+
+        // Create star glow effect
+        svg += \`<circle class="star" cx="\${star.x}" cy="\${star.y}" r="\${radius}" opacity="\${0.5 + star.size * 0.1}"/>\`;
+
+        // Add star labels
+        if (star.label) {
+          svg += \`<text class="star-label" x="\${star.x}" y="\${star.y + radius + 4}">\${star.label}</text>\`;
+        }
+      }
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    function formatBestMonths(months) {
+      const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      if (months.length === 12) return 'Year-round';
+      if (months.length <= 4) {
+        return months.map(m => names[m - 1]).join(', ');
+      }
+      return names[months[0] - 1] + ' - ' + names[months[months.length - 1] - 1];
+    }
+
+    function closeConstellationModal() {
+      const modal = document.getElementById('constellation-modal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function closeModalOnOverlay(event) {
+      if (event.target.id === 'constellation-modal') {
+        closeConstellationModal();
+      }
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeConstellationModal();
+      }
+    });
   </script>
 </body>
 </html>`;

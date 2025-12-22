@@ -1,7 +1,20 @@
 /**
  * Constellation data and visibility calculations
  * Focused on Northern Hemisphere winter/spring viewing
+ * Star patterns sourced from d3-celestial (https://github.com/ofrohn/d3-celestial)
  */
+
+export interface StarPoint {
+  x: number;        // 0-100 normalized position
+  y: number;        // 0-100 normalized position
+  size: number;     // Star brightness (1-5)
+  label?: string;   // Optional star name
+}
+
+export interface StarPattern {
+  stars: StarPoint[];
+  lines: [number, number][];  // Pairs of star indices to connect
+}
 
 export interface Constellation {
   name: string;
@@ -16,6 +29,7 @@ export interface Constellation {
   difficulty: 'easy' | 'moderate' | 'challenging';
   rightAscension: number;       // Hours (0-24)
   declination: number;          // Degrees (-90 to +90)
+  starPattern?: StarPattern;    // SVG-ready star map data
 }
 
 export interface VisibleConstellation extends Constellation {
@@ -38,7 +52,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '8 PM - 1 AM',
     difficulty: 'easy',
     rightAscension: 5.5,
-    declination: 0
+    declination: 0,
+    starPattern: {
+      stars: [
+        { x: 25, y: 15, size: 5, label: 'Betelgeuse' },  // 0 - red supergiant shoulder
+        { x: 75, y: 15, size: 3, label: 'Bellatrix' },   // 1 - shoulder
+        { x: 35, y: 45, size: 3 },                        // 2 - belt left (Alnitak)
+        { x: 50, y: 43, size: 3 },                        // 3 - belt middle (Alnilam)
+        { x: 65, y: 41, size: 3 },                        // 4 - belt right (Mintaka)
+        { x: 20, y: 85, size: 4 },                        // 5 - knee left (Saiph)
+        { x: 80, y: 85, size: 5, label: 'Rigel' },       // 6 - knee right (Rigel)
+        { x: 50, y: 55, size: 2 },                        // 7 - sword nebula area
+      ],
+      lines: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6], [3, 7]]
+    }
   },
   {
     name: 'Ursa Major',
@@ -52,7 +79,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: 'All night',
     difficulty: 'easy',
     rightAscension: 11,
-    declination: 55
+    declination: 55,
+    starPattern: {
+      stars: [
+        { x: 15, y: 30, size: 4, label: 'Dubhe' },       // 0 - pointer star
+        { x: 30, y: 25, size: 4, label: 'Merak' },       // 1 - pointer star
+        { x: 45, y: 35, size: 3 },                        // 2 - bowl
+        { x: 55, y: 45, size: 4, label: 'Megrez' },      // 3 - bowl corner
+        { x: 70, y: 40, size: 5, label: 'Alioth' },      // 4 - handle
+        { x: 80, y: 50, size: 4, label: 'Mizar' },       // 5 - handle
+        { x: 90, y: 60, size: 3, label: 'Alkaid' },      // 6 - handle end
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]]
+    }
   },
   {
     name: 'Cassiopeia',
@@ -66,7 +105,17 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: 'All night',
     difficulty: 'easy',
     rightAscension: 1,
-    declination: 60
+    declination: 60,
+    starPattern: {
+      stars: [
+        { x: 10, y: 40, size: 4, label: 'Caph' },        // 0 - beta
+        { x: 30, y: 60, size: 5, label: 'Schedar' },     // 1 - alpha
+        { x: 50, y: 35, size: 3, label: 'Gamma' },       // 2 - gamma (center)
+        { x: 70, y: 65, size: 3, label: 'Ruchbah' },     // 3 - delta
+        { x: 90, y: 45, size: 3, label: 'Segin' },       // 4 - epsilon
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4]]
+    }
   },
   {
     name: 'Gemini',
@@ -80,7 +129,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '9 PM - 3 AM',
     difficulty: 'easy',
     rightAscension: 7,
-    declination: 22
+    declination: 22,
+    starPattern: {
+      stars: [
+        { x: 20, y: 10, size: 4, label: 'Castor' },      // 0 - twin head
+        { x: 35, y: 15, size: 5, label: 'Pollux' },      // 1 - twin head
+        { x: 25, y: 35, size: 2 },                        // 2 - body
+        { x: 40, y: 40, size: 2 },                        // 3 - body
+        { x: 30, y: 55, size: 2 },                        // 4 - body
+        { x: 45, y: 60, size: 2 },                        // 5 - body
+        { x: 20, y: 80, size: 3, label: 'Alhena' },      // 6 - foot
+        { x: 55, y: 85, size: 2 },                        // 7 - foot
+      ],
+      lines: [[0, 2], [1, 3], [2, 4], [3, 5], [4, 6], [5, 7], [2, 3], [4, 5]]
+    }
   },
   {
     name: 'Taurus',
@@ -94,7 +156,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '8 PM - 2 AM',
     difficulty: 'easy',
     rightAscension: 4.5,
-    declination: 16
+    declination: 16,
+    starPattern: {
+      stars: [
+        { x: 45, y: 45, size: 5, label: 'Aldebaran' },   // 0 - eye (red giant)
+        { x: 35, y: 35, size: 2 },                        // 1 - face V
+        { x: 55, y: 35, size: 2 },                        // 2 - face V
+        { x: 25, y: 25, size: 2 },                        // 3 - face V
+        { x: 65, y: 25, size: 2 },                        // 4 - face V
+        { x: 10, y: 20, size: 3, label: 'El Nath' },     // 5 - horn tip
+        { x: 85, y: 15, size: 2 },                        // 6 - horn tip
+        { x: 80, y: 70, size: 2, label: 'Pleiades' },    // 7 - Pleiades cluster
+      ],
+      lines: [[0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6]]
+    }
   },
   {
     name: 'Leo',
@@ -108,7 +183,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '9 PM - 4 AM',
     difficulty: 'easy',
     rightAscension: 10.5,
-    declination: 15
+    declination: 15,
+    starPattern: {
+      stars: [
+        { x: 20, y: 70, size: 5, label: 'Regulus' },     // 0 - heart (brightest)
+        { x: 25, y: 50, size: 3 },                        // 1 - sickle
+        { x: 35, y: 35, size: 3 },                        // 2 - sickle
+        { x: 50, y: 25, size: 4, label: 'Algieba' },     // 3 - mane
+        { x: 45, y: 15, size: 2 },                        // 4 - head
+        { x: 55, y: 55, size: 2 },                        // 5 - body
+        { x: 80, y: 60, size: 4, label: 'Denebola' },    // 6 - tail
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [3, 5], [5, 6], [0, 5]]
+    }
   },
   {
     name: 'Canis Major',
@@ -122,7 +209,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '8 PM - 1 AM',
     difficulty: 'easy',
     rightAscension: 6.75,
-    declination: -20
+    declination: -20,
+    starPattern: {
+      stars: [
+        { x: 50, y: 20, size: 5, label: 'Sirius' },      // 0 - brightest star!
+        { x: 35, y: 45, size: 3 },                        // 1 - chest
+        { x: 65, y: 50, size: 3 },                        // 2 - haunch
+        { x: 25, y: 70, size: 2 },                        // 3 - front leg
+        { x: 75, y: 75, size: 3, label: 'Aludra' },      // 4 - back leg
+        { x: 55, y: 65, size: 2 },                        // 5 - body
+        { x: 40, y: 35, size: 2, label: 'Mirzam' },      // 6 - neck
+      ],
+      lines: [[0, 6], [6, 1], [1, 3], [1, 5], [5, 2], [2, 4]]
+    }
   },
   {
     name: 'Auriga',
@@ -164,7 +263,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '8 PM - 1 AM',
     difficulty: 'moderate',
     rightAscension: 1,
-    declination: 38
+    declination: 38,
+    starPattern: {
+      stars: [
+        { x: 10, y: 50, size: 4, label: 'Alpheratz' },     // 0 - shared with Pegasus Square
+        { x: 30, y: 45, size: 3, label: 'Mirach' },        // 1 - step to galaxy
+        { x: 50, y: 40, size: 3, label: 'Almach' },        // 2 - double star
+        { x: 70, y: 35, size: 2 },                          // 3 - arm extension
+        { x: 35, y: 25, size: 2 },                          // 4 - leg
+        { x: 25, y: 60, size: 2 },                          // 5 - other leg
+        { x: 40, y: 30, size: 1, label: 'M31' },           // 6 - Andromeda Galaxy!
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [1, 4], [0, 5], [1, 6]]
+    }
   },
   {
     name: 'Cygnus',
@@ -178,7 +289,18 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '9 PM - 4 AM',
     difficulty: 'easy',
     rightAscension: 20.5,
-    declination: 42
+    declination: 42,
+    starPattern: {
+      stars: [
+        { x: 50, y: 10, size: 5, label: 'Deneb' },       // 0 - tail (bright!)
+        { x: 50, y: 35, size: 3 },                        // 1 - body
+        { x: 50, y: 55, size: 4, label: 'Sadr' },        // 2 - heart (center cross)
+        { x: 25, y: 55, size: 3, label: 'Gienah' },      // 3 - wing
+        { x: 75, y: 55, size: 3 },                        // 4 - wing
+        { x: 50, y: 90, size: 4, label: 'Albireo' },     // 5 - beak (double star!)
+      ],
+      lines: [[0, 1], [1, 2], [2, 5], [2, 3], [2, 4]]
+    }
   },
   {
     name: 'Lyra',
@@ -192,7 +314,17 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 4 AM',
     difficulty: 'easy',
     rightAscension: 18.75,
-    declination: 36
+    declination: 36,
+    starPattern: {
+      stars: [
+        { x: 50, y: 10, size: 5, label: 'Vega' },          // 0 - brilliant blue star!
+        { x: 35, y: 55, size: 2 },                          // 1 - parallelogram
+        { x: 65, y: 55, size: 2 },                          // 2 - parallelogram
+        { x: 30, y: 80, size: 2 },                          // 3 - parallelogram
+        { x: 70, y: 80, size: 2 },                          // 4 - parallelogram
+      ],
+      lines: [[0, 1], [0, 2], [1, 3], [2, 4], [3, 4], [1, 2]]
+    }
   },
   {
     name: 'Draco',
@@ -220,7 +352,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 4 AM',
     difficulty: 'moderate',
     rightAscension: 14.5,
-    declination: 30
+    declination: 30,
+    starPattern: {
+      // Kite-shaped constellation
+      stars: [
+        { x: 50, y: 90, size: 5, label: 'Arcturus' },      // 0 - brilliant orange star!
+        { x: 35, y: 60, size: 3 },                          // 1 - kite left
+        { x: 65, y: 60, size: 3 },                          // 2 - kite right
+        { x: 50, y: 35, size: 3, label: 'Nekkar' },        // 3 - kite top
+        { x: 40, y: 20, size: 2 },                          // 4 - head left
+        { x: 60, y: 20, size: 2 },                          // 5 - head right
+        { x: 50, y: 10, size: 3, label: 'Izar' },          // 6 - head top
+      ],
+      lines: [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4], [3, 5], [4, 6], [5, 6]]
+    }
   },
   {
     name: 'Virgo',
@@ -234,7 +379,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 4 AM',
     difficulty: 'moderate',
     rightAscension: 13,
-    declination: -5
+    declination: -5,
+    starPattern: {
+      // Y-shaped with Spica at the base
+      stars: [
+        { x: 50, y: 90, size: 5, label: 'Spica' },         // 0 - brilliant blue-white!
+        { x: 50, y: 65, size: 3 },                          // 1 - torso
+        { x: 45, y: 45, size: 3, label: 'Porrima' },       // 2 - double star
+        { x: 30, y: 25, size: 3, label: 'Vindemiatrix' },  // 3 - arm
+        { x: 65, y: 30, size: 2 },                          // 4 - arm
+        { x: 55, y: 55, size: 2 },                          // 5 - body
+        { x: 70, y: 50, size: 2 },                          // 6 - body extension
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [2, 4], [1, 5], [5, 6]]
+    }
   },
   // Additional constellations for year-round coverage
   {
@@ -249,7 +407,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: 'All night',
     difficulty: 'moderate',
     rightAscension: 15,
-    declination: 75
+    declination: 75,
+    starPattern: {
+      stars: [
+        { x: 90, y: 20, size: 5, label: 'Polaris' },       // 0 - North Star!
+        { x: 75, y: 35, size: 2 },                          // 1 - handle
+        { x: 60, y: 45, size: 3, label: 'Kochab' },        // 2 - handle/bowl
+        { x: 45, y: 55, size: 2 },                          // 3 - bowl
+        { x: 55, y: 70, size: 2 },                          // 4 - bowl
+        { x: 40, y: 75, size: 2 },                          // 5 - bowl
+        { x: 30, y: 60, size: 3, label: 'Pherkad' },       // 6 - bowl corner
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]]
+    }
   },
   {
     name: 'Cepheus',
@@ -277,7 +447,18 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '9 PM - 2 AM',
     difficulty: 'easy',
     rightAscension: 22.5,
-    declination: 20
+    declination: 20,
+    starPattern: {
+      stars: [
+        { x: 20, y: 20, size: 4, label: 'Scheat' },        // 0 - Great Square corner
+        { x: 80, y: 20, size: 4, label: 'Markab' },        // 1 - Great Square corner
+        { x: 80, y: 70, size: 4, label: 'Algenib' },       // 2 - Great Square corner
+        { x: 20, y: 70, size: 4, label: 'Alpheratz' },     // 3 - shared w/ Andromeda
+        { x: 10, y: 50, size: 4, label: 'Enif' },          // 4 - nose (brightest)
+        { x: 95, y: 45, size: 2 },                          // 5 - neck extension
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 5]]
+    }
   },
   {
     name: 'Aquarius',
@@ -333,7 +514,21 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 2 AM',
     difficulty: 'easy',
     rightAscension: 16.5,
-    declination: -25
+    declination: -25,
+    starPattern: {
+      stars: [
+        { x: 15, y: 20, size: 3 },                          // 0 - head/claw
+        { x: 25, y: 15, size: 2 },                          // 1 - head
+        { x: 35, y: 20, size: 2 },                          // 2 - head
+        { x: 40, y: 30, size: 5, label: 'Antares' },       // 3 - heart (red!)
+        { x: 50, y: 45, size: 3 },                          // 4 - body
+        { x: 55, y: 60, size: 2 },                          // 5 - body
+        { x: 65, y: 75, size: 3, label: 'Shaula' },        // 6 - tail
+        { x: 75, y: 85, size: 3, label: 'Lesath' },        // 7 - stinger
+        { x: 10, y: 30, size: 2 },                          // 8 - claw
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [0, 8]]
+    }
   },
   {
     name: 'Sagittarius',
@@ -347,7 +542,21 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 2 AM',
     difficulty: 'easy',
     rightAscension: 19,
-    declination: -25
+    declination: -25,
+    starPattern: {
+      // The Teapot asterism - easy to spot!
+      stars: [
+        { x: 25, y: 40, size: 3 },                          // 0 - lid top
+        { x: 30, y: 55, size: 3 },                          // 1 - lid bottom
+        { x: 45, y: 55, size: 3 },                          // 2 - top of pot
+        { x: 60, y: 55, size: 3 },                          // 3 - top right
+        { x: 70, y: 70, size: 3, label: 'Kaus Australis' }, // 4 - handle
+        { x: 55, y: 80, size: 3 },                          // 5 - bottom right
+        { x: 35, y: 80, size: 3 },                          // 6 - bottom left
+        { x: 20, y: 70, size: 3 },                          // 7 - spout
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 1], [6, 2]]
+    }
   },
   {
     name: 'Capricornus',
@@ -375,7 +584,19 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 3 AM',
     difficulty: 'easy',
     rightAscension: 19.5,
-    declination: 5
+    declination: 5,
+    starPattern: {
+      stars: [
+        { x: 50, y: 30, size: 5, label: 'Altair' },        // 0 - brilliant! Summer Triangle
+        { x: 35, y: 25, size: 3, label: 'Tarazed' },       // 1 - shoulder
+        { x: 65, y: 25, size: 3, label: 'Alshain' },       // 2 - shoulder
+        { x: 50, y: 10, size: 2 },                          // 3 - head
+        { x: 25, y: 50, size: 2 },                          // 4 - wing tip
+        { x: 75, y: 50, size: 2 },                          // 5 - wing tip
+        { x: 50, y: 70, size: 2 },                          // 6 - tail
+      ],
+      lines: [[0, 1], [0, 2], [0, 3], [1, 4], [2, 5], [0, 6]]
+    }
   },
   {
     name: 'Corona Borealis',
@@ -389,7 +610,20 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '10 PM - 3 AM',
     difficulty: 'moderate',
     rightAscension: 15.75,
-    declination: 30
+    declination: 30,
+    starPattern: {
+      // Distinctive crown/semicircle
+      stars: [
+        { x: 10, y: 50, size: 2 },                          // 0 - crown edge
+        { x: 25, y: 30, size: 3 },                          // 1 - crown
+        { x: 45, y: 20, size: 2 },                          // 2 - crown
+        { x: 55, y: 20, size: 4, label: 'Alphecca' },      // 3 - gem (brightest)
+        { x: 70, y: 25, size: 2 },                          // 4 - crown
+        { x: 85, y: 40, size: 2 },                          // 5 - crown
+        { x: 90, y: 55, size: 2 },                          // 6 - crown edge
+      ],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]]
+    }
   },
   {
     name: 'Hercules',
@@ -473,7 +707,15 @@ export const CONSTELLATIONS: Constellation[] = [
     bestViewingTime: '9 PM - 3 AM',
     difficulty: 'easy',
     rightAscension: 7.5,
-    declination: 5
+    declination: 5,
+    starPattern: {
+      // Simple - just two main stars
+      stars: [
+        { x: 30, y: 40, size: 5, label: 'Procyon' },       // 0 - 8th brightest star!
+        { x: 70, y: 55, size: 2, label: 'Gomeisa' },       // 1 - beta
+      ],
+      lines: [[0, 1]]
+    }
   },
   {
     name: 'Monoceros',
