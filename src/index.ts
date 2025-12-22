@@ -162,7 +162,7 @@ app.get('/og-image.png', async (c) => {
     <text x="600" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="120" font-weight="700" fill="#f59e0b">${days}</text>
     <text x="600" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" fill="#94a3b8">days until Spring Equinox</text>
 
-    <text x="600" y="580" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#64748b">spring-countdown.bill-burkey.workers.dev</text>
+    <text x="600" y="580" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#64748b">springcountdown.com</text>
   </svg>`;
 
   // Return SVG as the OG image (most platforms accept SVG)
@@ -183,19 +183,19 @@ function renderHTML(): string {
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://spring-countdown.bill-burkey.workers.dev">
+  <meta property="og:url" content="https://springcountdown.com">
   <meta property="og:title" content="Spring is Coming! 🌸 Count Down to Longer Days">
   <meta property="og:description" content="Track the growing daylight since winter solstice. Explore moon phases, constellations, and celestial wisdom as we journey toward spring.">
-  <meta property="og:image" content="https://spring-countdown.bill-burkey.workers.dev/og-image.png">
+  <meta property="og:image" content="https://springcountdown.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://spring-countdown.bill-burkey.workers.dev">
+  <meta name="twitter:url" content="https://springcountdown.com">
   <meta name="twitter:title" content="Spring is Coming! 🌸 Count Down to Longer Days">
   <meta name="twitter:description" content="Track the growing daylight since winter solstice. Explore moon phases, constellations, and celestial wisdom.">
-  <meta name="twitter:image" content="https://spring-countdown.bill-burkey.workers.dev/og-image.png">
+  <meta name="twitter:image" content="https://springcountdown.com/og-image.png">
 
   <!-- PWA / Apple -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1103,7 +1103,7 @@ function renderHTML(): string {
     }
 
     // Social sharing
-    const shareUrl = 'https://spring-countdown.bill-burkey.workers.dev';
+    const shareUrl = 'https://springcountdown.com';
     const shareTitle = 'Spring is Coming! 🌸';
     const shareText = 'Only ' + document.getElementById('spring-days')?.textContent + ' days until Spring Equinox! Track the growing daylight and explore the night sky.';
 

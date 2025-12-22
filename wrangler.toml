@@ -4,6 +4,12 @@ main = "src/index.ts"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Custom domain routes
+routes = [
+  { pattern = "springcountdown.com/*", zone_name = "springcountdown.com" },
+  { pattern = "www.springcountdown.com/*", zone_name = "springcountdown.com" }
+]
+
 # Development settings
 [dev]
 port = 8787
