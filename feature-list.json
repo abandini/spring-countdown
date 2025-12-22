@@ -1,11 +1,11 @@
 {
   "project": "Spring Countdown",
-  "description": "A joyful PWA counting down to spring and daylight savings time, celebrating the return of longer days with sunlight tracking, social sharing, and Cloudflare's AI suite",
+  "description": "A joyful PWA counting down to spring - celebrating longer days with sunlight tracking, astronomy features (constellations, ISS, moon phases, ancient sky lore), social sharing, and Cloudflare's AI suite",
   "created": "2025-12-22",
   "stats": {
-    "total": 42,
+    "total": 50,
     "passing": 0,
-    "failing": 42
+    "failing": 50
   },
   "features": [
     {
@@ -501,6 +501,110 @@
         "Compressed images",
         "Font subsetting or system fonts",
         "Minified CSS/JS"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-001",
+      "category": "Astronomy",
+      "priority": 1,
+      "description": "Moon phase display with current phase visualization",
+      "acceptance_criteria": [
+        "Shows current moon phase (new, waxing, full, waning)",
+        "Visual moon icon that matches actual phase",
+        "Phase name and illumination percentage",
+        "Next full/new moon dates"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-002",
+      "category": "Astronomy",
+      "priority": 1,
+      "description": "Tonight's visible constellations based on user location",
+      "acceptance_criteria": [
+        "Lists major constellations visible tonight",
+        "Shows best viewing time for each",
+        "Direction to look (N, S, E, W, overhead)",
+        "Brief description of each constellation"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-003",
+      "category": "Astronomy",
+      "priority": 2,
+      "description": "ISS sighting predictions for user location",
+      "acceptance_criteria": [
+        "Fetches upcoming ISS passes from API",
+        "Shows date, time, duration, brightness",
+        "Direction and elevation for viewing",
+        "Link to set reminder"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-004",
+      "category": "Astronomy",
+      "priority": 2,
+      "description": "Daily astronomical events and notes",
+      "acceptance_criteria": [
+        "Today's astronomical highlights",
+        "Meteor showers, planet visibility",
+        "Special events (eclipses, conjunctions)",
+        "Updates automatically"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-005",
+      "category": "Astronomy",
+      "priority": 2,
+      "description": "Ancient astronomy and sky lore for the day",
+      "acceptance_criteria": [
+        "Historical/cultural sky stories",
+        "What ancient cultures observed this time of year",
+        "Solstice/equinox traditions",
+        "Rotating daily content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-006",
+      "category": "Astronomy",
+      "priority": 2,
+      "description": "Visible planets tonight with positions",
+      "acceptance_criteria": [
+        "Lists planets visible tonight",
+        "Rise/set times for each",
+        "Brightness and best viewing time",
+        "Which constellation they're in"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-007",
+      "category": "Astronomy",
+      "priority": 3,
+      "description": "Star map / sky chart visualization",
+      "acceptance_criteria": [
+        "Interactive or static sky map",
+        "Shows current sky for user location/time",
+        "Major stars and constellations labeled",
+        "Orientation helper (hold phone to sky)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "astro-008",
+      "category": "Astronomy",
+      "priority": 3,
+      "description": "Astronomical twilight times (golden hour, blue hour)",
+      "acceptance_criteria": [
+        "Civil, nautical, astronomical twilight times",
+        "Golden hour start/end for photographers",
+        "Blue hour timing",
+        "Best stargazing window"
       ],
       "passes": false
     }
