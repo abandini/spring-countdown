@@ -19,12 +19,12 @@ DST_START = "2025-03-09T07:00:00Z"        # 2AM EST = 7AM UTC
 [[d1_databases]]
 binding = "DB"
 database_name = "spring-db"
-database_id = "placeholder"  # Run: wrangler d1 create spring-db
+database_id = "887b912a-7836-41c6-a750-d81c5dd95851"
 
 # KV Namespace - Caching sunrise/sunset data
 [[kv_namespaces]]
 binding = "KV"
-id = "placeholder"  # Run: wrangler kv:namespace create SPRING_KV
+id = "176c276770b545ee8d3cf71b4bb74dad"
 
 # R2 Bucket - Generated share images
 [[r2_buckets]]
