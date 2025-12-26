@@ -186,19 +186,30 @@ function getMonthNames(months: number[]): string {
 
 // Main app
 app.get('/', (c) => {
+  // Prevent CDN caching so users always get the latest version
+  c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  c.header('Pragma', 'no-cache');
+  c.header('Expires', '0');
   return c.html(renderHTML());
 });
 
 // Service worker
 app.get('/sw.js', async (c) => {
   const sw = `
-const CACHE_NAME = 'spring-v1';
-self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+const CACHE_NAME = 'spring-v2';
+self.addEventListener('install', e => e.waitUntil(
+  caches.keys().then(keys => Promise.all(
+    keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+  )).then(() => self.skipWaiting())
+));
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('/api/')) {
+  const url = new URL(e.request.url);
+  // Network-first for HTML pages and API calls
+  if (e.request.mode === 'navigate' || url.pathname === '/' || url.pathname.startsWith('/api/')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
   } else {
+    // Cache-first for static assets
     e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
   }
 });

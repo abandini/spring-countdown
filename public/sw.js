@@ -1,22 +1,8 @@
 // Spring Countdown Service Worker
-const CACHE_NAME = 'spring-countdown-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.json'
-];
+const CACHE_NAME = 'spring-countdown-v3';
 
-// Install event - cache static assets
+// Install event - clean old caches and activate immediately
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
-  self.skipWaiting();
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -26,36 +12,34 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
+  self.skipWaiting();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Activate event - take control immediately
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+// Fetch event - network-first for HTML, cache-first for assets
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // For API requests, always go to network first
-  if (url.pathname.startsWith('/api/')) {
+  // For API requests and HTML pages, always go to network first
+  if (url.pathname.startsWith('/api/') || event.request.mode === 'navigate' || url.pathname === '/') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Cache successful API responses
-          if (response.ok) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
           return response;
         })
         .catch(() => {
-          // Return cached API response if network fails
+          // Return cached response if network fails
           return caches.match(event.request);
         })
     );
     return;
   }
 
-  // For other requests, try cache first, then network
+  // For static assets, try cache first, then network
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -63,7 +47,6 @@ self.addEventListener('fetch', (event) => {
       }
 
       return fetch(event.request).then((response) => {
-        // Don't cache non-successful responses
         if (!response.ok) {
           return response;
         }
